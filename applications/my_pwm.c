@@ -17,7 +17,7 @@ struct rt_device_pwm *ov_dev;
 
 rt_int32_t speed_period,speed_pulse;
 rt_int32_t direction_period,direction_pulse;
-rt_int32_t ov_period,ov_pulse;
+rt_uint32_t ov_period,ov_pulse;
 
 int my_pwm_enable(void);
 int my_pwm_disable(void);
@@ -51,22 +51,23 @@ int my_pwm_init(void)
     {
         rt_kprintf("direction_dev init error\n");
     }
-    rt_pwm_set(direction_dev, DIRECTION_CHANNEL,direction_period , direction_period*direction_period/1000);
+    rt_pwm_enable(direction_dev, DIRECTION_CHANNEL);
 
-    ov_period = 20000000,ov_pulse = 75;
+
+    ov_period = 20000000,ov_pulse = 125;
     ov_dev = (struct rt_device_pwm*)rt_device_find(OV_PWM);
     if(ov_dev == RT_NULL)
     {
         rt_kprintf("ov_dev init error\n");
     }
-    rt_pwm_set(ov_dev, OV_CHANNEL, ov_period, ov_period*ov_pulse/1000);
-
-    rt_pwm_enable(direction_dev, DIRECTION_CHANNEL);
     rt_pwm_enable(ov_dev, OV_CHANNEL);
+
+    rt_pwm_set(ov_dev, OV_CHANNEL, ov_period, (ov_period*ov_pulse)/1000);
+    rt_pwm_set(direction_dev, DIRECTION_CHANNEL,direction_period , direction_period*direction_pulse/1000);
+
+
     return err;
 }
-
-INIT_APP_EXPORT(my_pwm_init);
 
 int my_pwm_enable(void)
 {
@@ -112,11 +113,11 @@ int my_pwm_extern_set_pulse(int argc,char **argv)
         }
         else if(strcmp(dev_name,"dir")==0)
         {
-            rt_pwm_set(direction_dev, DIRECTION_CHANNEL, direction_period, new_pulse);
+            rt_pwm_set(direction_dev, DIRECTION_CHANNEL, direction_period, direction_period*new_pulse/1000);
         }
         else if(strcmp(dev_name,"ov")==0)
         {
-            rt_pwm_set(ov_dev, OV_CHANNEL, ov_period, new_pulse);
+            rt_pwm_set(ov_dev, OV_CHANNEL, ov_period, ov_period*new_pulse/1000);
         }
     }
     else

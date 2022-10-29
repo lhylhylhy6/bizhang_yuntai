@@ -15,6 +15,10 @@
 
 #define CAR_MSH_ENABLE 1
 
+extern rt_int32_t speed_period,speed_pulse;
+extern struct rt_device_pwm *left_dev;
+extern struct rt_device_pwm *right_dev;
+
 int car_init(void)
 {
     rt_err_t ret = RT_EOK;
@@ -51,6 +55,22 @@ int car_stop(void)
     my_pwm_disable();
     rt_kprintf("now car is stop\r\n");
     return RT_EOK;
+}
+
+int car_speed_set(int argc,char **argv)
+{
+    if(argc==2)
+    {
+        speed_pulse = atoi(argv[1]);
+        my_pwm_set(right_dev, speed_pulse);
+        my_pwm_set(left_dev, speed_pulse);
+        rt_kprintf("set pulse to %d\n",speed_pulse);
+    }
+    else
+    {
+        rt_kprintf("format error!\n");
+    }
+    return 0;
 }
 
 #if CAR_MSH_ENABLE

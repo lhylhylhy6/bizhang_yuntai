@@ -9,6 +9,8 @@
  */
 #include "uart2.h"
 
+extern rt_mutex_t ov_val_pro;
+struct rt_completion ov_comp;
 rt_sem_t ov_rx_sem = RT_NULL;
 rt_device_t ov_uart = RT_NULL;
 rt_thread_t ov_pid_thread;
@@ -32,10 +34,14 @@ static void ov_thread_enty(void *parameter)
         }
         if(ch=='[')
          {
+            rt_mutex_take(ov_val_pro, RT_WAITING_FOREVER);
          }
          else if(ch==']')
          {
              ov_location = location;
+             rt_mutex_release(ov_val_pro);
+             rt_completion_done(&ov_comp);
+             //rt_kprintf("%d\n",ov_location);
              location = 0 ;
          }
          else if(ch=='c')
@@ -53,7 +59,10 @@ static void ov_thread_enty(void *parameter)
 rt_err_t ov_uart_init(void)
 {
     rt_err_t ret = RT_EOK;
+    ov_val_pro = rt_mutex_create("ov_val_pro", RT_IPC_FLAG_PRIO);
+    rt_mutex_release(ov_val_pro);
     ov_rx_sem = rt_sem_create("ov_rx", 0, RT_IPC_FLAG_PRIO);
+    rt_completion_init(&ov_comp);
     ov_uart = rt_device_find(ov_uart_name);
     if(ov_uart)
     {
@@ -64,6 +73,8 @@ rt_err_t ov_uart_init(void)
         return -1;
     }
     rt_device_set_rx_indicate(ov_uart, ov_rx_interupt);
+
+
     ov_pid_thread = rt_thread_create("ov_read_thread", ov_thread_enty, 0, 1024, 5, 300);
     if(ov_pid_thread)
     {

@@ -10,26 +10,29 @@
 #include <ov_pid.h>
 #include "my_pwm.h"
 
+rt_mutex_t ov_val_pro;
 rt_thread_t ov_pid_compute;
 rt_int32_t max_pulse = 125,min_pulse = 25;
-extern rt_int32_t ov_period,ov_pulse;
+extern rt_uint32_t ov_period,ov_pulse;
 extern struct rt_device_pwm *ov_dev;
+extern struct rt_completion ov_comp;
 extern rt_uint32_t ov_location;
 int middle = 160;
-float kp = 0;
+float kp = -0.1105;
 float ki = 0;
 float kd = 0;
 float dia=0;
 float error=0,ierror=0,derror=0,errorlast=0;
 
-int angle_limit(rt_int32_t *angle)
+int angle_limit(rt_uint32_t *angle)
 {
     if(*angle<min_pulse)
         *angle = min_pulse;
     else if (*angle>max_pulse) {
         *angle = max_pulse;
     }
-    rt_pwm_set(ov_dev,OV_CHANNEL, ov_period, *angle);
+    //rt_kprintf("%d\n",*angle);
+    rt_pwm_set(ov_dev,OV_CHANNEL, ov_period, ov_period*(*angle)/1000);
     return RT_EOK;
 }
 
@@ -42,7 +45,7 @@ int direction_pid_compute(rt_int32_t val)
        if(ierror>3000) ierror=3000;
        else if(ierror<-3000) ierror=-3000;
        dia = kp*error+ki*ierror+kd*derror;
-       ov_pulse = ov_pulse+dia;
+       ov_pulse = ov_pulse-dia;
        return 0;
 }
 
@@ -50,17 +53,21 @@ void ov_pid_entry(void *parameter)
 {
     while(1)
     {
+        rt_completion_wait(&ov_comp, RT_WAITING_FOREVER);
         dia = 0;
+        rt_mutex_take(ov_val_pro, RT_WAITING_FOREVER);
         direction_pid_compute(ov_location);
+        rt_mutex_release(ov_val_pro);
         angle_limit(&ov_pulse);
-        rt_thread_delay(10);
+        rt_thread_mdelay(100);
     }
 }
 
 
-int ov_pid_init()
+int ov_pid_init(void)
 {
     rt_err_t err = RT_EOK;
+
     ov_pid_compute = rt_thread_create("ov_pid", ov_pid_entry, RT_NULL, 1024, 7, 300);
     if(ov_pid_compute)
     {
