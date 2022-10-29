@@ -9,9 +9,12 @@
  */
 #include <ov_pid.h>
 #include "my_pwm.h"
+
+rt_thread_t ov_pid_compute;
 rt_int32_t max_pulse = 125,min_pulse = 25;
 extern rt_int32_t ov_period,ov_pulse;
 extern struct rt_device_pwm *ov_dev;
+extern rt_uint32_t ov_location;
 int middle = 160;
 float kp = 0;
 float ki = 0;
@@ -30,9 +33,9 @@ int angle_limit(rt_int32_t *angle)
     return RT_EOK;
 }
 
-int direction_pid_compute(rt_int32_t *val)
+int direction_pid_compute(rt_int32_t val)
 {
-       error = middle*1.0 - *val;
+       error = middle*1.0 - val;
        ierror=ierror+error;
        derror=error-errorlast;
        errorlast=error;
@@ -40,6 +43,47 @@ int direction_pid_compute(rt_int32_t *val)
        else if(ierror<-3000) ierror=-3000;
        dia = kp*error+ki*ierror+kd*derror;
        ov_pulse = ov_pulse+dia;
-
        return 0;
 }
+
+void ov_pid_entry(void *parameter)
+{
+    while(1)
+    {
+        dia = 0;
+        direction_pid_compute(ov_location);
+        angle_limit(&ov_pulse);
+        rt_thread_delay(10);
+    }
+}
+
+
+int ov_pid_init()
+{
+    rt_err_t err = RT_EOK;
+    ov_pid_compute = rt_thread_create("ov_pid", ov_pid_entry, RT_NULL, 1024, 7, 300);
+    if(ov_pid_compute)
+    {
+       rt_kprintf("ov_pid_thread create successfully\n");
+       rt_thread_startup(ov_pid_compute);
+    }
+    else {
+        rt_kprintf("ov_pid_thread create error\n");
+    }
+    return err;
+}
+
+int ov_pid_set(int argc,char **argv)
+{
+    if(argc < 4)
+    {
+        rt_kprintf("Too few parameters\n");
+        return error;
+    }
+    kp =  atof(argv[1]);
+    ki =  atof(argv[2]);
+    kd =  atof(argv[3]);
+    rt_kprintf("ov_pid set ok\n");
+    return RT_EOK;
+}
+MSH_CMD_EXPORT(ov_pid_set,ov_pid parameter set);

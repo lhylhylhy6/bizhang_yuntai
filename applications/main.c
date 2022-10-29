@@ -15,11 +15,13 @@
 #include <rtdbg.h>
 
 #include "car.h"
+#include "uart2.h"
 
 int main(void)
 {
     int count = 1;
     car_init();
+    ov_uart_init();
     while (count++)
     {
         rt_thread_mdelay(1000);
