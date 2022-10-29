@@ -73,12 +73,13 @@ int my_pwm_disable(void)
     return RT_EOK;
 }
 
-int my_pwm_set(struct rt_device_pwm *pwm,rt_int32_t *new_pulse)
+int my_pwm_set(struct rt_device_pwm *pwm,rt_int32_t new_pulse)
 {
     if(pwm == left_dev)
-        rt_pwm_set(left_dev, LEFT_CHANNEL, speed_period, *new_pulse*speed_period/100);
-    else if (pwm == right_dev) {
-        rt_pwm_set(right_dev, RIGHT_CHANNEL, speed_period, *new_pulse*speed_period/100);
+        rt_pwm_set(left_dev, LEFT_CHANNEL, speed_period, new_pulse*speed_period/100);
+    else if (pwm == right_dev)
+    {
+        rt_pwm_set(right_dev, RIGHT_CHANNEL, speed_period, new_pulse*speed_period/100);
     }
     return RT_EOK;
 }

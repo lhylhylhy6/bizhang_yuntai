@@ -10,9 +10,10 @@
 #ifndef APPLICATIONS_CAR_H_
 #define APPLICATIONS_CAR_H_
 
-#include"rtthread.h"
-#include"rtdevice.h"
-#include"board.h"
+#include "rtthread.h"
+#include "rtdevice.h"
+#include "board.h"
+#include "my_pwm.h"
 
 #define AIN1_PIN GET_PIN(F, 6)
 #define AIN2_PIN GET_PIN(F, 7)

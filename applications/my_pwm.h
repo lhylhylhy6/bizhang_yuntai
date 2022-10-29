@@ -27,6 +27,6 @@
 int my_pwm_init(void);
 int my_pwm_enable(void);
 int my_pwm_disable(void);
-int my_pwm_set(struct rt_device_pwm *pwm,rt_int32_t *new_pulse);
+int my_pwm_set(struct rt_device_pwm *pwm,rt_int32_t new_pulse);
 
 #endif /* APPLICATIONS_MY_PWM_H_ */
