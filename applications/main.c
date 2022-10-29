@@ -26,6 +26,7 @@ int main(void)
     my_pwm_init();
     ov_uart_init();
     ov_pid_init();
+    HCSR_forward_init();
     LOG_D("init ok\n");
     while (count++)
     {

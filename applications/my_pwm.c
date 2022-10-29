@@ -15,8 +15,8 @@ struct rt_device_pwm *right_dev;
 struct rt_device_pwm *direction_dev;
 struct rt_device_pwm *ov_dev;
 
-rt_int32_t speed_period,speed_pulse;
-rt_int32_t direction_period,direction_pulse;
+rt_uint32_t speed_period,speed_pulse;
+rt_uint32_t direction_period,direction_pulse;
 rt_uint32_t ov_period,ov_pulse;
 
 int my_pwm_enable(void);
@@ -45,7 +45,7 @@ int my_pwm_init(void)
     my_pwm_disable();
 
 
-    direction_period = 20000000,direction_pulse = 75;
+    direction_period = 20000000,direction_pulse = 60;
     direction_dev = (struct rt_device_pwm*)rt_device_find(DIRECTION_PWM);
     if(direction_dev == RT_NULL)
     {
@@ -83,14 +83,9 @@ int my_pwm_disable(void)
     return RT_EOK;
 }
 
-int my_pwm_set(struct rt_device_pwm *pwm,rt_int32_t new_pulse)
+int my_pwm_set(int channel,rt_int32_t new_pulse)
 {
-    if(pwm == left_dev)
-        rt_pwm_set(left_dev, LEFT_CHANNEL, speed_period, new_pulse*speed_period/100);
-    else if (pwm == right_dev)
-    {
-        rt_pwm_set(right_dev, RIGHT_CHANNEL, speed_period, new_pulse*speed_period/100);
-    }
+    rt_pwm_set(right_dev, channel, speed_period, new_pulse*speed_period/100);
     return RT_EOK;
 }
 
@@ -105,11 +100,11 @@ int my_pwm_extern_set_pulse(int argc,char **argv)
 
         if(strcmp(dev_name,"left")==0)
         {
-            my_pwm_set(left_dev, new_pulse);
+            my_pwm_set(LEFT_CHANNEL, new_pulse);
         }
         else if(strcmp(dev_name,"right")==0)
         {
-            my_pwm_set(right_dev, new_pulse);
+            my_pwm_set(RIGHT_CHANNEL, new_pulse);
         }
         else if(strcmp(dev_name,"dir")==0)
         {
