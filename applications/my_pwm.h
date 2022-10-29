@@ -13,6 +13,8 @@
 #include "rtthread.h"
 #include "rtdevice.h"
 #include "board.h"
+#include "stdlib.h"
+#include "string.h"
 
 #define LEFT_PWM           "pwm3"
 #define LEFT_CHANNEL         1

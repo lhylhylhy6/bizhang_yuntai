@@ -19,11 +19,15 @@ rt_int32_t speed_period,speed_pulse;
 rt_int32_t direction_period,direction_pulse;
 rt_int32_t ov_period,ov_pulse;
 
+int my_pwm_enable(void);
+int my_pwm_disable(void);
+
 int my_pwm_init(void)
 {
     rt_err_t err = RT_EOK;
     speed_period = 1000000;
     speed_pulse  = 50;
+
     left_dev = (struct rt_device_pwm*)rt_device_find(LEFT_PWM);
     if(left_dev == RT_NULL)
     {
@@ -36,6 +40,10 @@ int my_pwm_init(void)
     }
     rt_pwm_set(left_dev, LEFT_CHANNEL, speed_period, speed_period*speed_pulse/100);
     rt_pwm_set(right_dev, RIGHT_CHANNEL, speed_period, speed_period*speed_pulse/100);
+
+
+    my_pwm_disable();
+
 
     direction_period = 20000000,direction_pulse = 75;
     direction_dev = (struct rt_device_pwm*)rt_device_find(DIRECTION_PWM);
@@ -52,6 +60,7 @@ int my_pwm_init(void)
         rt_kprintf("ov_dev init error\n");
     }
     rt_pwm_set(ov_dev, OV_CHANNEL, ov_period, ov_period*ov_pulse/1000);
+
     rt_pwm_enable(direction_dev, DIRECTION_CHANNEL);
     rt_pwm_enable(ov_dev, OV_CHANNEL);
     return err;
@@ -84,6 +93,41 @@ int my_pwm_set(struct rt_device_pwm *pwm,rt_int32_t new_pulse)
     return RT_EOK;
 }
 
+int my_pwm_extern_set_pulse(int argc,char **argv)
+{
+    char *dev_name;
+    rt_uint32_t new_pulse=0;
+    if(argc>=2)
+    {
+        dev_name = argv[1];
+        new_pulse = atoi(argv[2]);
+
+        if(strcmp(dev_name,"left")==0)
+        {
+            my_pwm_set(left_dev, new_pulse);
+        }
+        else if(strcmp(dev_name,"right")==0)
+        {
+            my_pwm_set(right_dev, new_pulse);
+        }
+        else if(strcmp(dev_name,"dir")==0)
+        {
+            rt_pwm_set(direction_dev, DIRECTION_CHANNEL, direction_period, new_pulse);
+        }
+        else if(strcmp(dev_name,"ov")==0)
+        {
+            rt_pwm_set(ov_dev, OV_CHANNEL, ov_period, new_pulse);
+        }
+    }
+    else
+    {
+        rt_kprintf("please input my_pwm_extern_set_pulse <dev_name> <new_pulse>\r\n");
+        rt_kprintf("<dev_name> can be left/right/dir/ov \r\n");
+    }
+
+    return 0;
+}
 
 
+MSH_CMD_EXPORT(my_pwm_extern_set_pulse,set dev pulse);
 

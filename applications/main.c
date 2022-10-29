@@ -13,6 +13,7 @@
 #define DBG_TAG "main"
 #define DBG_LVL DBG_LOG
 #include <rtdbg.h>
+
 #include "car.h"
 
 int main(void)
@@ -21,7 +22,6 @@ int main(void)
     car_init();
     while (count++)
     {
-//        LOG_D("Hello RT-Thread!");
         rt_thread_mdelay(1000);
     }
 
