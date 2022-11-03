@@ -18,4 +18,6 @@ rt_err_t HCSR_mid_init(void);
 rt_err_t HCSR_forward_init(void);
 rt_err_t HCSR_back_init(void);
 
+rt_err_t HCSR_forward_init(void);
+
 #endif /* APPLICATIONS_HCSR04_H_ */

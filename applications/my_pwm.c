@@ -54,7 +54,7 @@ int my_pwm_init(void)
     rt_pwm_enable(direction_dev, DIRECTION_CHANNEL);
 
 
-    ov_period = 20000000,ov_pulse = 125;
+    ov_period = 20000000,ov_pulse = 25;
     ov_dev = (struct rt_device_pwm*)rt_device_find(OV_PWM);
     if(ov_dev == RT_NULL)
     {

@@ -12,7 +12,7 @@
 
 rt_mutex_t ov_val_pro;
 rt_thread_t ov_pid_compute;
-rt_int32_t max_pulse = 125,min_pulse = 25;
+rt_uint32_t max_pulse = 125,min_pulse = 25;
 extern rt_uint32_t ov_period,ov_pulse;
 extern struct rt_device_pwm *ov_dev;
 extern struct rt_completion ov_comp;
