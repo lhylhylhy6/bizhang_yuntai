@@ -100,6 +100,21 @@ int car_speed_set(int argc,char **argv)
     return 0;
 }
 
+int car_right_forward(void)
+{
+    rt_pwm_set(direction_dev, DIRECTION_CHANNEL, direction_period, direction_period*78/1000);
+    car_start();
+    rt_thread_mdelay(1000);
+    rt_pwm_set(direction_dev, DIRECTION_CHANNEL, direction_period, direction_period*65/1000);
+
+    return 0;
+}
+
+int car_left_forward(void)
+{
+    rt_pwm_set(direction_dev, DIRECTION_CHANNEL, direction_period, direction_period*25/1000);
+    return 0;
+}
 #if CAR_MSH_ENABLE
 
 MSH_CMD_EXPORT(car_stop,car stop);
@@ -107,4 +122,5 @@ MSH_CMD_EXPORT(car_start,car forward);
 MSH_CMD_EXPORT(car_speed_set,car_speed_set);
 MSH_CMD_EXPORT(car_left,car_left);
 MSH_CMD_EXPORT(car_right,car_right);
+MSH_CMD_EXPORT(car_right_forward,car_angle_forward);
 #endif

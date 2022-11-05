@@ -14,4 +14,6 @@
 #include "rtdevice.h"
 #include "board.h"
 
+int straight_pid_init(void);
+
 #endif /* APPLICATIONS_STRAIGHT_PID_H_ */
