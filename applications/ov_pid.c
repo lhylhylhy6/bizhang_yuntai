@@ -13,10 +13,14 @@
 rt_mutex_t ov_val_pro;
 rt_thread_t ov_pid_compute;
 rt_uint32_t max_pulse = 125,min_pulse = 25;
+
+rt_mailbox_t straight_single = RT_NULL;
+
 extern rt_uint32_t ov_period,ov_pulse;
 extern struct rt_device_pwm *ov_dev;
 extern struct rt_completion ov_comp;
 extern rt_uint32_t ov_location;
+extern struct rt_completion straight_comp;
 int middle = 160;
 float kp = -0.1105;
 float ki = 0;
@@ -59,6 +63,7 @@ void ov_pid_entry(void *parameter)
         direction_pid_compute(ov_location);
         rt_mutex_release(ov_val_pro);
         angle_limit(&ov_pulse);
+        rt_completion_done(&straight_comp);
         rt_thread_mdelay(100);
     }
 }
@@ -67,7 +72,7 @@ void ov_pid_entry(void *parameter)
 int ov_pid_init(void)
 {
     rt_err_t err = RT_EOK;
-
+    straight_single = rt_mb_create("straight_single", 1, RT_IPC_FLAG_FIFO);
     ov_pid_compute = rt_thread_create("ov_pid", ov_pid_entry, RT_NULL, 1024, 7, 300);
     if(ov_pid_compute)
     {

@@ -26,7 +26,7 @@ int my_pwm_init(void)
 {
     rt_err_t err = RT_EOK;
     speed_period = 1000000;
-    speed_pulse  = 50;
+    speed_pulse  = 30;
 
     left_dev = (struct rt_device_pwm*)rt_device_find(LEFT_PWM);
     if(left_dev == RT_NULL)
@@ -45,7 +45,7 @@ int my_pwm_init(void)
     my_pwm_disable();
 
 
-    direction_period = 20000000,direction_pulse = 60;
+    direction_period = 20000000,direction_pulse = 70;
     direction_dev = (struct rt_device_pwm*)rt_device_find(DIRECTION_PWM);
     if(direction_dev == RT_NULL)
     {
@@ -54,7 +54,7 @@ int my_pwm_init(void)
     rt_pwm_enable(direction_dev, DIRECTION_CHANNEL);
 
 
-    ov_period = 20000000,ov_pulse = 25;
+    ov_period = 20000000,ov_pulse = 90;
     ov_dev = (struct rt_device_pwm*)rt_device_find(OV_PWM);
     if(ov_dev == RT_NULL)
     {
