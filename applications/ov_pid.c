@@ -12,22 +12,26 @@
 
 rt_mutex_t ov_val_pro;
 rt_thread_t ov_pid_compute;
-rt_uint32_t max_pulse = 125,min_pulse = 25;
+rt_uint32_t max_pulse = 130,min_pulse = 20;
 
 rt_mailbox_t straight_single = RT_NULL;
-
+rt_uint32_t ov_mid_pulse = 75;
+/*
+ * 中间75 右打死 20 左打死130
+ */
 extern rt_uint32_t ov_period,ov_pulse;
 extern struct rt_device_pwm *ov_dev;
 extern struct rt_completion ov_comp;
 extern rt_uint32_t ov_location;
 extern struct rt_completion straight_comp;
+
 int middle = 160;
-float kp = -0.1105;
+float kp = 0.0339;
 float ki = 0;
-float kd = 0;
+float kd = 0.029;
 float dia=0;
 float error=0,ierror=0,derror=0,errorlast=0;
-
+rt_uint32_t old_pulse = 75;
 int angle_limit(rt_uint32_t *angle)
 {
     if(*angle<min_pulse)
@@ -35,36 +39,44 @@ int angle_limit(rt_uint32_t *angle)
     else if (*angle>max_pulse) {
         *angle = max_pulse;
     }
-    //rt_kprintf("%d\n",*angle);
+
+//    rt_kprintf("%d\n",*angle);
     rt_pwm_set(ov_dev,OV_CHANNEL, ov_period, ov_period*(*angle)/1000);
+
     return RT_EOK;
 }
 
 int direction_pid_compute(rt_int32_t val)
 {
        error = middle*1.0 - val;
+
        ierror=ierror+error;
        derror=error-errorlast;
        errorlast=error;
        if(ierror>3000) ierror=3000;
        else if(ierror<-3000) ierror=-3000;
        dia = kp*error+ki*ierror+kd*derror;
-       ov_pulse = ov_pulse-dia;
+       ov_pulse =  ov_pulse-dia; //125-25
+
        return 0;
 }
-
+rt_uint8_t ov_stop_flag=1;
 void ov_pid_entry(void *parameter)
 {
     while(1)
     {
-        rt_completion_wait(&ov_comp, RT_WAITING_FOREVER);
-        dia = 0;
-        rt_mutex_take(ov_val_pro, RT_WAITING_FOREVER);
-        direction_pid_compute(ov_location);
-        rt_mutex_release(ov_val_pro);
-        angle_limit(&ov_pulse);
-        rt_completion_done(&straight_comp);
-        rt_thread_mdelay(100);
+        if(ov_stop_flag==1)
+        {
+            rt_completion_wait(&ov_comp, RT_WAITING_FOREVER);
+            dia = 0;
+            rt_mutex_take(ov_val_pro, RT_WAITING_FOREVER);
+            direction_pid_compute(ov_location);
+            rt_mutex_release(ov_val_pro);
+            angle_limit(&ov_pulse);
+            rt_completion_done(&straight_comp);
+        }
+
+        rt_thread_mdelay(10);
     }
 }
 
@@ -97,5 +109,12 @@ int ov_pid_set(int argc,char **argv)
     kd =  atof(argv[3]);
     rt_kprintf("ov_pid set ok\n");
     return RT_EOK;
+}
+void ov_pid_clearn(void)
+{
+    error=0;
+    ierror=0;
+    derror=0;
+    errorlast=0;
 }
 MSH_CMD_EXPORT(ov_pid_set,ov_pid parameter set);

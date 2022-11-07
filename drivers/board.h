@@ -96,9 +96,10 @@ extern "C"
 #endif
 
 /*#define BSP_USING_I2C2*/
+#define BSP_USING_I2C2
 #ifdef BSP_USING_I2C2
-#define BSP_I2C2_SCL_PIN    GET_PIN(port, pin)
-#define BSP_I2C2_SDA_PIN    GET_PIN(port, pin)
+#define BSP_I2C2_SCL_PIN    GET_PIN(D, 6)
+#define BSP_I2C2_SDA_PIN    GET_PIN(D, 7)
 #endif
 
 /*-------------------------- I2C CONFIG END --------------------------*/

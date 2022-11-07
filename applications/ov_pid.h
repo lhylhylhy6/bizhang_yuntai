@@ -18,5 +18,6 @@
 int angle_limit(rt_uint32_t *angle);
 int direction_pid_compute(rt_int32_t val);
 int ov_pid_init(void);
+void ov_pid_clearn(void);
 
 #endif /* APPLICATIONS_OV_PID_H_ */

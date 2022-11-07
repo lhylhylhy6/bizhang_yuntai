@@ -54,10 +54,18 @@ rt_err_t rt_device_register(rt_device_t dev,
                             rt_uint16_t flags)
 {
     if (dev == RT_NULL)
-        return -RT_ERROR;
+    {
+        rt_kprintf("!!!!!!!!!!!!1\n");
+         return -RT_ERROR;
+    }
+
 
     if (rt_device_find(name) != RT_NULL)
+    {
+        rt_kprintf("!!!!!!!!!!!!2\n");
         return -RT_ERROR;
+    }
+
 
     rt_object_init(&(dev->parent), RT_Object_Class_Device, name);
     dev->flag = flags;

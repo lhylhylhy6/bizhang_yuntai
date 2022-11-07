@@ -213,7 +213,13 @@
 
 /* peripheral libraries and drivers */
 
-#define PKG_USING_SENSORS_DRIVERS
+/* sensors drivers */
+
+/* end of sensors drivers */
+
+/* touch drivers */
+
+/* end of touch drivers */
 
 /* Kendryte SDK */
 

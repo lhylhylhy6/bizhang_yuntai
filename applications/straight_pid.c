@@ -10,7 +10,10 @@
 #include "straight_pid.h"
 #include "my_pwm.h"
 rt_thread_t straight_pid;
-int straight_mid = 75;
+int straight_mid = 60;
+/*
+ *中间 55 右打死85 左打死20
+ */
 float straight_kp = -0.92;
 float straight_ki = 0;
 float straight_kd = 0;
@@ -18,13 +21,14 @@ float straight_dia=0;
 float error1=0,ierror1=0,derror1=0,errorlast1=0;
 extern struct rt_completion straight_comp;
 extern struct rt_device_pwm *direction_dev;
-rt_uint32_t straight_max_pulse = 115,straight_min_pulse=24;
-rt_uint32_t straight_middle_pulse = 70;
+rt_uint32_t straight_max_pulse = 85,straight_min_pulse=20;
+rt_uint32_t straight_middle_pulse = 67;
 extern rt_uint32_t direction_period,direction_pulse;
 extern rt_uint32_t ov_period,ov_pulse;
 extern rt_uint32_t ov_location;
 extern rt_mailbox_t straight_single;
-
+extern int stop_flag;
+rt_uint32_t old_pwm = 55;
 int staright_pid_limit(int pwm_l)
 {
     if(pwm_l<straight_min_pulse)
@@ -33,8 +37,10 @@ int staright_pid_limit(int pwm_l)
         pwm_l = straight_max_pulse;
     }
     //rt_kprintf("%d\n",*angle);
-    rt_kprintf("pwm_l is:%d\n",pwm_l);
+    //rt_kprintf("pwm_l is:%d\n",pwm_l);
+
     rt_pwm_set(direction_dev,DIRECTION_CHANNEL,direction_period,direction_period*(pwm_l)/1000);
+
     return RT_EOK;
 }
 
@@ -56,10 +62,15 @@ void straight_entry(void *parameter)
 {
     while(1)
     {
-        rt_completion_wait(&straight_comp, RT_WAITING_FOREVER);
-        straight_pid_compute(ov_pulse);
-        rt_kprintf("ov_pulse is :%d\n",ov_pulse);
+        if(stop_flag==0)
+        {
+//        rt_completion_wait(&straight_comp, RT_WAITING_FOREVER);
+          straight_pid_compute(ov_pulse);
+      //  rt_kprintf("ov_pulse is :%d\n",ov_pulse);
+
+        }
         rt_thread_mdelay(100);
+
     }
 
 }
