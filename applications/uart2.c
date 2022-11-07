@@ -43,7 +43,7 @@ static void ov_thread_enty(void *parameter)
              rt_mutex_release(ov_val_pro);
              rt_completion_done(&ov_comp);
 
-             //rt_kprintf("%d\n",ov_location);
+           //  rt_kprintf("%d\n",ov_location);
              location = 0 ;
          }
          else if(ch=='c')
