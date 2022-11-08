@@ -13,6 +13,7 @@
 extern float f_dis;
 extern struct rt_device_pwm *direction_dev;
 extern struct rt_device_pwm *ov_dev;
+extern struct rt_device_pwm *down_dev;
 extern rt_uint32_t direction_period,direction_pulse;
 extern rt_uint32_t ov_period,ov_pulse;
 rt_uint32_t pulse_4 = 30;
@@ -130,13 +131,14 @@ int test_5(int argc,char **argv)
 {
     int direction_pulse=85;
     int test_ov = 75;
-
-    if(argc==3)
+    int test_down = 90;
+    if(argc==4)
     {
         direction_pulse = atoi(argv[1]);
         test_ov = atoi(argv[2]);
+        test_down = atoi(argv[3]);
     }
-
+    rt_pwm_set(down_dev, DOWN_CHANNEL,ov_period , ov_period*test_down/1000);
     rt_pwm_set(direction_dev, DIRECTION_CHANNEL, direction_period, direction_period*direction_pulse/1000);
     car_start();
     ov_stop_flag=0;
