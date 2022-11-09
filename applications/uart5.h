@@ -5,17 +5,15 @@
  *
  * Change Logs:
  * Date           Author       Notes
- * 2022-11-05     10091       the first version
+ * 2022-11-09     lhylh       the first version
  */
-#ifndef APPLICATIONS_TEST_H_
-#define APPLICATIONS_TEST_H_
+#ifndef APPLICATIONS_UART5_H_
+#define APPLICATIONS_UART5_H_
 
 #include "rtthread.h"
 #include "rtdevice.h"
 #include "board.h"
-#include "my_pwm.h"
-#include "car.h"
 
-void test_init(void);
+rt_err_t jg_uart_init(void);
 
-#endif /* APPLICATIONS_TEST_H_ */
+#endif /* APPLICATIONS_UART5_H_ */

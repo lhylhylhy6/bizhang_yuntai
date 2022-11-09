@@ -73,6 +73,10 @@ extern "C"
 #define BSP_USING_UART2
 #define BSP_UART2_TX_PIN       "PA2"
 #define BSP_UART2_RX_PIN       "PA3"
+
+#define BSP_USING_UART5
+#define BSP_UART5_TX_PIN       "PC12"
+#define BSP_UART5_RX_PIN       "PD2"
 /*-------------------------- UART CONFIG END --------------------------*/
 
 /*-------------------------- I2C CONFIG BEGIN --------------------------*/
@@ -96,7 +100,6 @@ extern "C"
 #endif
 
 /*#define BSP_USING_I2C2*/
-#define BSP_USING_I2C2
 #ifdef BSP_USING_I2C2
 #define BSP_I2C2_SCL_PIN    GET_PIN(D, 6)
 #define BSP_I2C2_SDA_PIN    GET_PIN(D, 7)
@@ -231,9 +234,9 @@ extern "C"
  *
  */
 
-/*#define BSP_USING_TIM*/
+#define BSP_USING_TIM
 #ifdef BSP_USING_TIM
-/*#define BSP_USING_TIM15*/
+#define BSP_USING_TIM2
 /*#define BSP_USING_TIM16*/
 /*#define BSP_USING_TIM17*/
 #endif

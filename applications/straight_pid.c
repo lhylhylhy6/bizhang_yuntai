@@ -10,7 +10,7 @@
 #include "straight_pid.h"
 #include "my_pwm.h"
 rt_thread_t straight_pid;
-int straight_mid = 60;
+int straight_mid = 62;
 /*
  *中间 55 右打死85 左打死20
  */

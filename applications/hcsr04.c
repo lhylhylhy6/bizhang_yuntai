@@ -42,7 +42,7 @@ float back_val=99999;
 float forward_min_val=99999;
 float back_min_val=99999;
 
-float f_dis;
+
 
 
 
@@ -67,14 +67,7 @@ static void hcsr_forward_thread_entry(void *parameter)
             rt_pin_write(FORWARD_HC_Trig_Pin,PIN_HIGH);
             rt_hw_us_delay(10);
             rt_pin_write(FORWARD_HC_Trig_Pin,PIN_LOW);
-            while(!rt_pin_read(FORWARD_HC_Echo_Pin))
-            {
-                int a=0;
-                a++;
-                rt_hw_us_delay(50);
-                if(a>800)
-                    goto __exit;
-            }
+            while(!rt_pin_read(FORWARD_HC_Echo_Pin));
             while(rt_pin_read(FORWARD_HC_Echo_Pin))
             {
                 count++;
@@ -87,17 +80,13 @@ static void hcsr_forward_thread_entry(void *parameter)
         forward_val = S/100.0;
         f_dis = forward_val;
         forward_min_val = forward_min_val<forward_val?forward_min_val:forward_val;
-        //LOG_D("forward : S = %f cm\n",forward_val);
-//        if(forward_val<=CMP_MID_VAL)
-//        {
-//
-//        }
-__exit:
+        LOG_D("%f cm\n",forward_val);
         S=0;
         count=0;
         rt_thread_mdelay(190);
     }
 }
+
 
 static void hcsr_back_thread_entry(void *parameter)
 {

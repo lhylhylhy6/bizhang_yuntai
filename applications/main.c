@@ -19,6 +19,8 @@
 #include "ov_pid.h"
 #include "straight_pid.h"
 #include "hcsr04.h"
+#include "uart5.h"
+#include "test.h"
 
 
 rt_timer_t clear_distance;
@@ -26,7 +28,8 @@ extern rt_uint32_t direction_period,direction_pulse;
 extern rt_uint32_t ov_period,ov_pulse;
 extern struct rt_device_pwm *direction_dev;
 extern struct rt_device_pwm *ov_dev;
-extern float f_dis;
+extern rt_uint32_t f_dis;
+extern rt_uint16_t jg_val;
 
 
 
@@ -36,13 +39,19 @@ int main(void)
     car_init();
     my_pwm_init();
     ov_uart_init();
+    jg_uart_init();
     ov_pid_init();
     straight_pid_init();
-//
-    HCSR_forward_init();
+    OV_UP;
     LOG_D("init ok\n");
+    rt_thread_mdelay(2000);
+    test_init();
+
+    //HCSR_forward_init();
+
     while (count++)
     {
+        //rt_kprintf("%d\n",jg_val);
 //        LOG_D("%f\n",f_dis);
 #if 0
         car_right_forward();

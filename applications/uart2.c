@@ -43,7 +43,7 @@ static void ov_thread_enty(void *parameter)
              rt_mutex_release(ov_val_pro);
              rt_completion_done(&ov_comp);
 
-           //  rt_kprintf("%d\n",ov_location);
+             //rt_kprintf("%d\n",ov_location);
              location = 0 ;
          }
          else if(ch=='c')
@@ -88,6 +88,21 @@ rt_err_t ov_uart_init(void)
     }
     return ret;
 
+}
+
+int uart2_send_down(void)
+{
+    char ch = 'c';
+    rt_device_write(ov_uart, -1, &ch, sizeof(char));
+    rt_kprintf("%c\n",ch);
+    return 0;
+}
+int uart2_send_up(void)
+{
+    char ch = 'a';
+    rt_device_write(ov_uart, -1, &ch, sizeof(char));
+    rt_kprintf("%c\n",ch);
+    return 0;
 }
 
 

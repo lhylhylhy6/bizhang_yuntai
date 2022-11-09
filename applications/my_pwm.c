@@ -14,13 +14,11 @@ struct rt_device_pwm *left_dev;
 struct rt_device_pwm *right_dev;
 struct rt_device_pwm *direction_dev;
 struct rt_device_pwm *ov_dev;
-struct rt_device_pwm *down_dev;
 
 
 rt_uint32_t speed_period,speed_pulse;
 rt_uint32_t direction_period,direction_pulse;
 rt_uint32_t ov_period,ov_pulse;
-rt_uint32_t down_period,down_pulse;
 
 int my_pwm_enable(void);
 int my_pwm_disable(void);
@@ -67,12 +65,6 @@ int my_pwm_init(void)
 
     rt_pwm_set(ov_dev, OV_CHANNEL, ov_period, (ov_period*ov_pulse)/1000);
     rt_pwm_set(direction_dev, DIRECTION_CHANNEL,direction_period , direction_period*direction_pulse/1000);
-
-    down_dev = (struct rt_device_pwm*)rt_device_find(DOWN_PWM);
-
-    down_period = 20000000,down_pulse = 105;
-    rt_pwm_enable(down_dev, DOWN_CHANNEL);
-    rt_pwm_set(down_dev, DOWN_CHANNEL, down_period, (down_period*110)/1000);
 
     return err;
 }

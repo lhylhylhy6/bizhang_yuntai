@@ -25,8 +25,8 @@ extern struct rt_completion ov_comp;
 extern rt_uint32_t ov_location;
 extern struct rt_completion straight_comp;
 
-int middle = 160;
-float kp = 0.0339;
+int middle = 165;
+float kp =  0.0335;
 float ki = 0;
 float kd = 0.029;
 float dia=0;
