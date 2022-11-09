@@ -16,12 +16,14 @@
 #define DBG_LVL DBG_LOG
 #include <rtdbg.h>
 
+extern rt_device_t ov_uart;
 extern rt_uint16_t jg_val;
 extern struct rt_device_pwm *direction_dev;
 extern struct rt_device_pwm *ov_dev;
 extern struct rt_device_pwm *right_dev,*left_dev;
 extern rt_uint32_t direction_period,direction_pulse;
 extern rt_uint32_t ov_period,ov_pulse;
+extern rt_uint8_t final_stop;
 rt_uint32_t pulse_4 = 30;
 rt_uint32_t qiwang=200;
 int stop_flag = 0;
@@ -66,7 +68,7 @@ int test_2(void)
 //        rt_kprintf("left_forward error\n");
 //    }
 //    angle = atoi(argv[1]);
-    angle = 45;
+    angle = 50;
     car_start();
     while(xuanzhuan==0)
     {
@@ -90,12 +92,14 @@ int test_3(void)
     int i=5;
     for(i=5;i>=0;i--)
       rt_pwm_set(direction_dev, DIRECTION_CHANNEL, direction_period, direction_period*120/1000);
+      rt_pwm_set(left_dev, 2,1000000 , 1000000*35/100);
+
 
     while((flag3 == 0))
     {
         if(ov_stop_flag==0)
         {
-            rt_thread_mdelay(1000);
+            rt_thread_mdelay(700);
             ov_stop_flag=1;
         }
         if(ov_pulse>=100)
@@ -110,6 +114,7 @@ int test_3(void)
 
         }
     }
+    rt_pwm_set(left_dev, 2, 1000000, 1000000*20/100);
     car_stop();
 
 
@@ -123,8 +128,8 @@ int test_4(void)
 //    delay_tim = atoi(argv[2]);
     pulse_4 = 20;
     delay_tim = 1000;
-    rt_pwm_set(direction_dev, DIRECTION_CHANNEL, direction_period, direction_period*pulse_4/1000);
-    rt_pwm_set(right_dev, 1, 1000000, 40*10000);
+    rt_pwm_set(direction_dev, DIRECTION_CHANNEL, direction_period, direction_period*30/1000);
+    rt_pwm_set(right_dev, 1, 1000000, 35*10000);
     car_start();
     ov_stop_flag=0;
     ov_pid_clearn();
@@ -141,7 +146,7 @@ int test_4(void)
             flag4 = 1;
         rt_thread_mdelay(200);
     }
-    rt_pwm_set(right_dev, 1, 1000000, 30*10000);
+    rt_pwm_set(right_dev, 1, 1000000, 20*10000);
     car_stop();
     return 0;
 }
@@ -156,8 +161,9 @@ int test_5(void)
 //        direction_pulse = atoi(argv[1]);
 //        test_ov = atoi(argv[2]);
 //    }
-    //OV_DOWM;
-    rt_pwm_set(left_dev, 2, 1000000, 40*10000); //30
+    char ch='s';
+    rt_device_write(ov_uart, -1,&ch , sizeof(ch));
+    rt_pwm_set(left_dev, 2, 1000000, 30*10000); //30
     rt_pwm_set(direction_dev, DIRECTION_CHANNEL, direction_period, direction_period*direction_pulse/1000);
     car_start();
     ov_stop_flag=0;
@@ -166,13 +172,17 @@ int test_5(void)
     rt_thread_mdelay(1000);
 
     rt_thread_mdelay(3000); //旋转延时
-    rt_pwm_set(left_dev, 2, 1000000, 30*10000); //30
+    rt_pwm_set(left_dev, 2, 1000000, 20*10000); //30
     rt_pwm_set(direction_dev, DIRECTION_CHANNEL, direction_period, direction_period*50/1000);
     rt_thread_mdelay(1000);
-    ov_stop_flag=1;
-    rt_pwm_set(ov_dev, OV_CHANNEL, ov_period, ov_period*50/1000);
-    ov_pulse = 50;
     stop_flag=0;
+    ov_stop_flag=1;
+    if(final_stop==1)
+    {
+        OV_DOWM;
+        rt_pwm_set(ov_dev, OV_CHANNEL, ov_period, ov_period*80/1000);
+        ov_pulse = 80;
+    }
 
 
     return 0;

@@ -17,6 +17,7 @@ rt_device_t ov_uart = RT_NULL;
 rt_thread_t ov_pid_thread;
 rt_uint32_t location = 0;
 rt_uint32_t ov_location;
+rt_uint8_t final_stop=0;
 
 static rt_err_t ov_rx_interupt(rt_device_t dev,rt_size_t size)
 {
@@ -48,7 +49,7 @@ static void ov_thread_enty(void *parameter)
          }
          else if(ch=='c')
          {
-
+             final_stop = 1;
          }
          else if(ch>='0'&&ch<='9')
          {
