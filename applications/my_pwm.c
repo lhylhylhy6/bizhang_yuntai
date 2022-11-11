@@ -27,7 +27,7 @@ int my_pwm_init(void)
 {
     rt_err_t err = RT_EOK;
     speed_period = 1000000;
-    speed_pulse  = 20;
+    speed_pulse  = 30;
 
     left_dev = (struct rt_device_pwm*)rt_device_find(LEFT_PWM);
     if(left_dev == RT_NULL)

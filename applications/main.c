@@ -9,7 +9,7 @@
  */
 
 #include <rtthread.h>
-
+#include "tcs347225.h"
 #define DBG_TAG "main"
 #define DBG_LVL DBG_LOG
 #include <rtdbg.h>
@@ -30,7 +30,8 @@ extern struct rt_device_pwm *direction_dev;
 extern struct rt_device_pwm *ov_dev;
 extern rt_uint32_t f_dis;
 extern rt_uint16_t jg_val;
-
+extern COLOR_RGBC rgb;
+extern COLOR_HSL  hsl;
 
 
 int main(void)
@@ -45,12 +46,15 @@ int main(void)
     OV_UP;
     LOG_D("init ok\n");
     rt_thread_mdelay(2000);
-    test_init();
-
-    //HCSR_forward_init();
+   test_init();
+    TCS34725_Init();
+//    //HCSR_forward_init();
 
     while (count++)
     {
+//        TCS34725_GetRawData(&rgb);  //读两次，实际测试时发现读到的颜色总是上一次的颜色
+//        rt_kprintf("R=%d G=%d B=%d C=%d\r\n",rgb.r,rgb.g,rgb.b,rgb.c);
+//        rt_thread_mdelay(200);
         //rt_kprintf("%d\n",jg_val);
 //        LOG_D("%f\n",f_dis);
 #if 0
@@ -98,6 +102,5 @@ int main(void)
 #endif
         rt_thread_mdelay(200);
     }
-
     return RT_EOK;
 }
