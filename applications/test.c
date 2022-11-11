@@ -11,11 +11,13 @@
 #include "straight_pid.h"
 #include "ov_pid.h"
 #include "uart2.h"
-
+#include "tcs347225.h"
 #define DBG_TAG "test"
 #define DBG_LVL DBG_LOG
 #include <rtdbg.h>
 
+extern COLOR_RGBC rgb;
+extern COLOR_HSL  hsl;
 extern rt_device_t ov_uart;
 extern rt_uint16_t jg_val;
 extern struct rt_device_pwm *direction_dev;
@@ -80,9 +82,10 @@ int test_2(void)
     }
     car_stop();
     ov_stop_flag=0;
+    ov_pulse=65;
     ov_pid_clearn();
     for(int i=10;i>=0;i--)
-        rt_pwm_set(ov_dev, OV_CHANNEL, ov_period, ov_period*60/1000);
+        rt_pwm_set(ov_dev, OV_CHANNEL, ov_period, ov_period*65/1000);
     return 0;
 }
 
@@ -130,6 +133,7 @@ int test_4(void)
     delay_tim = 1000;
     rt_pwm_set(direction_dev, DIRECTION_CHANNEL, direction_period, direction_period*30/1000);
     rt_pwm_set(right_dev, 1, 1000000, 35*10000);
+    rt_pwm_set(right_dev, 2, 1000000, 30*10000);
     car_start();
     ov_stop_flag=0;
     ov_pid_clearn();
@@ -147,6 +151,7 @@ int test_4(void)
         rt_thread_mdelay(200);
     }
     rt_pwm_set(right_dev, 1, 1000000, 20*10000);
+    rt_pwm_set(right_dev, 2, 1000000, 20*10000);
     car_stop();
     return 0;
 }
@@ -171,7 +176,7 @@ int test_5(void)
     rt_pwm_set(ov_dev, OV_CHANNEL, ov_period, ov_period*test_ov/1000);
     rt_thread_mdelay(1000);
 
-    rt_thread_mdelay(3000); //旋转延时
+    rt_thread_mdelay(2700); //旋转延时
     rt_pwm_set(left_dev, 2, 1000000, 20*10000); //30
     rt_pwm_set(direction_dev, DIRECTION_CHANNEL, direction_period, direction_period*50/1000);
     rt_thread_mdelay(1000);
@@ -180,8 +185,21 @@ int test_5(void)
     if(final_stop==1)
     {
         OV_DOWM;
-        rt_pwm_set(ov_dev, OV_CHANNEL, ov_period, ov_period*80/1000);
-        ov_pulse = 80;
+        rt_pwm_set(ov_dev, OV_CHANNEL, ov_period, ov_period*75/1000);
+        ov_pulse = 75;
+    }
+    while(1)
+    {
+        TCS34725_GetRawData(&rgb);
+        rt_kprintf("%d %d %d %d\n",rgb.r,rgb.g,rgb.b,rgb.c);
+        if(rgb.c<500)
+        {
+            rt_kprintf("````````\n");
+            rt_thread_mdelay(1000);
+            car_stop();
+            break;
+        }
+        rt_thread_mdelay(50);
     }
 
 
