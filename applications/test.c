@@ -33,6 +33,7 @@ int xuanzhuan = 0;
 int flag3 = 0;
 int flag4=0;
 int angle = 50;
+rt_int32_t zhangai=0; //障碍<75 右侧 zhangai<0
 
 
 int test_1(void)
@@ -51,6 +52,11 @@ int test_1(void)
     while(stop_flag==0)
     {
       rt_thread_delay(200);
+      if(ov_pulse>75)
+          zhangai+=1;
+      else if(ov_pulse<75)
+          zhangai-=1;
+      //障碍<75 右侧 zhangai<0
       if(jg_val<qiwang)
       {
           LOG_D("------------%d\n",jg_val);
@@ -180,22 +186,38 @@ int test_5(void)
 
     OV_UP;
     rt_thread_mdelay(2500); //旋转延时
-
-    rt_pwm_set(direction_dev, DIRECTION_CHANNEL, direction_period, direction_period*50/1000);
-    rt_pwm_set(left_dev, 2, speed_period, speed_period *speed_pulse/100); //30
-    rt_thread_mdelay(2000);
-    car_stop();
     OV_DOWM;
-    red_flag=0;
+    if(zhangai<=0) //障碍在右侧
+    {
+        rt_pwm_set(direction_dev, DIRECTION_CHANNEL, direction_period, direction_period*80/1000);
+        rt_kprintf("~80~\n");
+    }
+    else {        //障碍在左侧
+        rt_pwm_set(direction_dev, DIRECTION_CHANNEL, direction_period, direction_period*40/1000);
+        rt_kprintf("~40~\n");
+    }
 
+    rt_pwm_set(left_dev, 2, speed_period, speed_period *speed_pulse/100); //30
+    rt_thread_mdelay(2200);
+    car_stop();
+
+    red_flag=0;
     rt_uint8_t tt=20;
-    while(!red_flag)
+    rt_uint8_t fangxiang=0;
+    while(1)
     {
         rt_pwm_set(ov_dev, OV_CHANNEL, ov_period, ov_period*tt/1000);
-        tt+=5;
+        if(red_flag==1)
+            break;
+        if(fangxiang==0)
+           tt+=5;
+        else if(fangxiang==1)
+            tt-=5;
         if(tt>=130)
-            tt=20;
-        rt_thread_mdelay(500);
+           fangxiang=1;
+        else if(tt<=20)
+            fangxiang=0;
+        rt_thread_mdelay(300);
     }
     ov_pulse = tt;
     ov_stop_flag=1;
@@ -213,8 +235,7 @@ int test_5(void)
     while(1)
     {
         TCS34725_GetRawData(&rgb);
-        rt_kprintf("%d %d %d %d\n",rgb.r,rgb.g,rgb.b,rgb.c);
-        if(rgb.c<500)
+        if(rgb.c<1000)
         {
             rt_kprintf("````````\n");
             rt_thread_mdelay(1000);
@@ -244,10 +265,15 @@ int test_5(void)
 rt_thread_t test_thread;
 void test_thread_entry(void *parameter)
 {
+    rt_kprintf("inter test_1\r\n");
     test_1();
+    rt_kprintf("inter test_2\r\n");
     test_2();
+    rt_kprintf("inter test_3\r\n");
     test_3();
+    rt_kprintf("inter test_4\r\n");
     test_4();
+    rt_kprintf("inter test_5\r\n");
     test_5();
 }
 void test_init(void)
