@@ -46,9 +46,8 @@ int main(void)
     OV_UP;
     LOG_D("init ok\n");
     rt_thread_mdelay(2000);
-   test_init();
+    test_init();
     TCS34725_Init();
-//    //HCSR_forward_init();
 
     while (count++)
     {
@@ -57,6 +56,7 @@ int main(void)
 //        rt_thread_mdelay(200);
         //rt_kprintf("%d\n",jg_val);
 //        LOG_D("%f\n",f_dis);
+        //rt_kprintf("%d\n",jg_val);
 #if 0
         car_right_forward();
         while(1)

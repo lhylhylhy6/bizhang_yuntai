@@ -18,6 +18,7 @@ rt_thread_t ov_pid_thread;
 rt_uint32_t location = 0;
 rt_uint32_t ov_location;
 rt_uint8_t final_stop=0;
+extern rt_uint8_t red_flag;
 
 static rt_err_t ov_rx_interupt(rt_device_t dev,rt_size_t size)
 {
@@ -43,7 +44,7 @@ static void ov_thread_enty(void *parameter)
              ov_location = location;
              rt_mutex_release(ov_val_pro);
              rt_completion_done(&ov_comp);
-
+             red_flag=1;
              //rt_kprintf("%d\n",ov_location);
              location = 0 ;
          }

@@ -156,7 +156,8 @@ int test_4(void)
     return 0;
 }
 
-
+extern rt_uint32_t speed_period,speed_pulse;
+rt_uint8_t red_flag;
 int test_5(void)
 {
     int direction_pulse=85;
@@ -168,26 +169,47 @@ int test_5(void)
 //    }
     char ch='s';
     rt_device_write(ov_uart, -1,&ch , sizeof(ch));
-    rt_pwm_set(left_dev, 2, 1000000, 30*10000); //30
+    rt_pwm_set(left_dev, 2, speed_period, speed_period *(speed_pulse+10)/100); //30
     rt_pwm_set(direction_dev, DIRECTION_CHANNEL, direction_period, direction_period*direction_pulse/1000);
     car_start();
+
     ov_stop_flag=0;
     ov_pid_clearn();
     rt_pwm_set(ov_dev, OV_CHANNEL, ov_period, ov_period*test_ov/1000);
-    rt_thread_mdelay(1000);
+    ov_pulse = test_ov;
 
-    rt_thread_mdelay(2700); //旋转延时
-    rt_pwm_set(left_dev, 2, 1000000, 20*10000); //30
+    OV_UP;
+    rt_thread_mdelay(2500); //旋转延时
+
     rt_pwm_set(direction_dev, DIRECTION_CHANNEL, direction_period, direction_period*50/1000);
-    rt_thread_mdelay(1000);
-    stop_flag=0;
-    ov_stop_flag=1;
-    if(final_stop==1)
+    rt_pwm_set(left_dev, 2, speed_period, speed_period *speed_pulse/100); //30
+    rt_thread_mdelay(2000);
+    car_stop();
+    OV_DOWM;
+    red_flag=0;
+
+    rt_uint8_t tt=20;
+    while(!red_flag)
     {
-        OV_DOWM;
-        rt_pwm_set(ov_dev, OV_CHANNEL, ov_period, ov_period*75/1000);
-        ov_pulse = 75;
+        rt_pwm_set(ov_dev, OV_CHANNEL, ov_period, ov_period*tt/1000);
+        tt+=5;
+        if(tt>=130)
+            tt=20;
+        rt_thread_mdelay(500);
     }
+    ov_pulse = tt;
+    ov_stop_flag=1;
+    stop_flag=0;
+    car_start();
+//    rt_thread_mdelay(1000);
+//
+//    ov_stop_flag=1;
+//    if(final_stop==1)
+//    {
+//
+//        rt_pwm_set(ov_dev, OV_CHANNEL, ov_period, ov_period*75/1000);
+//        ov_pulse = 75;
+//    }
     while(1)
     {
         TCS34725_GetRawData(&rgb);
@@ -205,6 +227,19 @@ int test_5(void)
 
     return 0;
 }
+
+//void test_001(int argc,char **argv)
+//{
+//    int a=speed_pulse;
+//    if(argc==2)
+//        a = atoi(argv[1]);
+//
+//    rt_pwm_set(direction_dev, DIRECTION_CHANNEL, direction_period, direction_period*20/1000);
+//    rt_pwm_set(left_dev, 2, speed_period, speed_period *0 /100); //30
+//    rt_pwm_set(right_dev, 1, speed_period, speed_period *a /100); //30
+//    car_start();
+//}
+//MSH_CMD_EXPORT(test_001,test_001);
 
 rt_thread_t test_thread;
 void test_thread_entry(void *parameter)
