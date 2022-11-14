@@ -16,6 +16,9 @@ rt_uint32_t max_pulse = 130,min_pulse = 20;
 
 rt_mailbox_t straight_single = RT_NULL;
 rt_uint32_t ov_mid_pulse = 75;
+
+rt_uint8_t ov_stop_flag=1;
+
 /*
  * 中间75 右打死 20 左打死130
  */
@@ -60,7 +63,7 @@ int direction_pid_compute(rt_int32_t val)
 
        return 0;
 }
-rt_uint8_t ov_stop_flag=1;
+
 void ov_pid_entry(void *parameter)
 {
     while(1)
