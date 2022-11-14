@@ -112,7 +112,10 @@ int car_right_forward(void)
 
 int car_left_forward(void)
 {
-    rt_pwm_set(direction_dev, DIRECTION_CHANNEL, direction_period, direction_period*25/1000);
+    rt_pwm_set(direction_dev, DIRECTION_CHANNEL, direction_period, direction_period*35/1000);
+    rt_pwm_set(right_dev, 1, 1000000, 35*10000); //右
+    rt_pwm_set(right_dev, 2, 1000000, 20*10000); //左
+
     return 0;
 }
 
